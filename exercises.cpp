@@ -25,8 +25,10 @@ static void LED_Thread1(void const *)
     char response[50];
     */
 
+    /* Set counter and direction for 4-LED counting
     int counter = 0;
     int ledDirection = 1;
+    */
 
     /*
     How to work with Pulls?
@@ -60,9 +62,14 @@ static void LED_Thread1(void const *)
         }
         */
 
+        /* Determine LED direction, light up LEDs in that direction, increment/reset the counter
         int originalCount = counter;
-        if (directionSwitch.Read()) {
-            ledDirection
+        if (directionSwitchInternal.Read()) {
+            ledDirection = 1;
+        } else if (directionSwitchExternal.Read()) {
+            ledDirection = -1;
+        } else {
+            ledDirection = 0;
         }
 
         for (int i = 3; i >= 0; i = i - 1) {
@@ -81,6 +88,7 @@ static void LED_Thread1(void const *)
         }
 
         counter = (originalCount + 1) % 15;
+        */
 
         //Sleep 10000ms for name
         //osDelay(10000);
