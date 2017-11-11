@@ -2,6 +2,7 @@
 #include <Uart.hpp>
 #include <DigitalOut.hpp>
 #include <Pins.hpp>
+#include <DigitalIn.hpp>
 
 
 Uart uart(PD9, PD8, 128, 128, 115200);
@@ -11,10 +12,10 @@ DigitalOut led1Out(PA2);
 DigitalOut led2Out(PA3);
 DigitalOut led3Out(PA4);
 
-DigitalOut ledOuts[4] = { led0Out, led1Out, led2Out, led3Out };
+DigitalIn directionSwitchInternal(PA5);
+DigitalIn directionSwitchExternal(PA6);
 
-int counter = 0;
-int ledDirection = 1;
+DigitalOut ledOuts[4] = { led0Out, led1Out, led2Out, led3Out };
 
 static void LED_Thread1(void const *)
 {
@@ -24,6 +25,13 @@ static void LED_Thread1(void const *)
     char response[50];
     */
 
+    int counter = 0;
+    int ledDirection = 1;
+
+    /*
+    How to work with Pulls?
+    directionSwitchInternal.SetPull(Pull());
+    */
     while (true)
     {
         //Fill the message with data
@@ -53,6 +61,9 @@ static void LED_Thread1(void const *)
         */
 
         int originalCount = counter;
+        if (directionSwitch.Read()) {
+            ledDirection
+        }
 
         for (int i = 3; i >= 0; i = i - 1) {
             if (counter >= (2 ^ (i))) {
