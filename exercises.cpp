@@ -14,6 +14,7 @@ DigitalOut led3Out(PA4);
 DigitalOut ledOuts[4] = { led0Out, led1Out, led2Out, led3Out };
 
 int counter = 0;
+int ledDirection = 1;
 
 static void LED_Thread1(void const *)
 {
@@ -56,11 +57,19 @@ static void LED_Thread1(void const *)
         for (int i = 3; i >= 0; i = i - 1) {
             if (counter >= (2 ^ (i))) {
                 counter -= counter % (2 ^ (i));
-                ledOuts[i].Set(true);
+                if (ledDirection == 1) {
+                    ledOuts[i].Set(true);
+                }
+                else if (ledDirection == -1) {
+                    ledOuts[3 - i].Set(true);
+                }
+                else {
+                    break;
+                }
             }
         }
 
-
+        counter = (originalCount + 1) % 15;
 
         //Sleep 10000ms for name
         //osDelay(10000);
