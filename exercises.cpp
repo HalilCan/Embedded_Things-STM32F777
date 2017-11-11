@@ -3,10 +3,12 @@
 #include <DigitalOut.hpp>
 #include <Pins.hpp>
 #include <DigitalIn.hpp>
+#include <AnalogIn.hpp>
 
 
 Uart uart(PD9, PD8, 128, 128, 115200);
 
+/* LED Pin setup:
 DigitalOut led0Out(PA1);
 DigitalOut led1Out(PA2);
 DigitalOut led2Out(PA3);
@@ -16,6 +18,9 @@ DigitalIn directionSwitchInternal(PA5);
 DigitalIn directionSwitchExternal(PA6);
 
 DigitalOut ledOuts[4] = { led0Out, led1Out, led2Out, led3Out };
+*/
+
+AnalogIn thermistorIn(PC1);
 
 static void LED_Thread1(void const *)
 {
@@ -31,9 +36,14 @@ static void LED_Thread1(void const *)
     */
 
     /*
-    How to work with Pulls?
+    TODO: How to work with Pulls?
     directionSwitchInternal.SetPull(Pull());
     */
+
+    char tempMessage[50];
+    float tc = 19.5; //mv / C
+    float v0 = 400; //mV
+
     while (true)
     {
         //Fill the message with data
@@ -86,13 +96,23 @@ static void LED_Thread1(void const *)
                 }
             }
         }
-
         counter = (originalCount + 1) % 15;
         */
 
+        float temp = thermistorIn.Read();
+        snprintf(tempMessage, sizeof_array(tempMessage), "Temp: %f", temp);
+
+        float vTemp = temp * 500.0; //TODO: Does the analog range 1-0 correspond to 500-0? Probably not.
+        //Ok, turns out the MCP range is 3.1 - 5.5 V. What about the STM?
+        float actualTemp = vTemp - 400.0
+
         //Sleep 10000ms for name
         //osDelay(10000);
+
         //Sleep 1000ms for single LED blink
+        //osDelay(1000);
+
+        //Sleep 1000ms for temperature measurement
         osDelay(1000);
     }
 }
