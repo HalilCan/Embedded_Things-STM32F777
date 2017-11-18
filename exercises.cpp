@@ -3,6 +3,7 @@
 #include <DigitalOut.hpp>
 #include <Pins.hpp>
 #include <DigitalIn.hpp>
+#include <Rtc.hpp>
 #include <AnalogIn.hpp>
 
 
@@ -20,7 +21,12 @@ DigitalIn directionSwitchExternal(PA6);
 DigitalOut ledOuts[4] = { led0Out, led1Out, led2Out, led3Out };
 */
 
+/* Temperature pin setup:
+ AnalogIn temperature(PA3);
+*/
+
 AnalogIn thermistorIn(PC1);
+char tempReading[10];
 
 static void LED_Thread1(void const *)
 {
@@ -40,9 +46,11 @@ static void LED_Thread1(void const *)
     directionSwitchInternal.SetPull(Pull());
     */
 
+    /*
     char tempMessage[50];
     float tc = 19.5; //mv / C
     float v0 = 400; //mV
+     */
 
     while (true)
     {
@@ -102,10 +110,10 @@ static void LED_Thread1(void const *)
         float temp = thermistorIn.Read();
         snprintf(tempMessage, sizeof_array(tempMessage), "Temp: %f", temp);
 
-        float vTemp = temp * 500.0; //TODO: Does the analog range 1-0 correspond to 500-0? Probably not.
+        float vTemp = ((temp * 3300.0) - 500.0) / 10.0; //TODO: Does the analog range 1-0 correspond to 500-0? Probably not.
         //Ok, turns out the MCP range is 3.1 - 5.5 V. What about the STM?
-        float actualTemp = vTemp - 400.0
-
+        float actualTemp = (vTemp * 1.8) + 32.0;
+        snprintf (tempReading, sizeof_array(tempReading), '%f', actualTemp);
         //Sleep 10000ms for name
         //osDelay(10000);
 
